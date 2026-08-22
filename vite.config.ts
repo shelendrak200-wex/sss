@@ -3,14 +3,29 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
+// Determine base path for GitHub Pages and local environments
+const getBasePath = () => {
+  if (process.env.VITE_BASE_PATH) return process.env.VITE_BASE_PATH;
+  if (process.env.BASE_URL) return process.env.BASE_URL;
+  if (process.env.GITHUB_REPOSITORY) {
+    const repoName = process.env.GITHUB_REPOSITORY.split('/')[1];
+    return repoName ? `/${repoName}/` : './';
+  }
+  return './';
+};
+
 export default defineConfig(() => {
   return {
-    base: './',
+    base: getBasePath(),
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
       },
+    },
+    build: {
+      outDir: 'dist',
+      assetsDir: 'assets',
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
